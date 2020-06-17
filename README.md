@@ -11,12 +11,9 @@ create .env file
 username=<otaku-streamer username>
 password=<otaku-streamer password>
 ```
-> example:
-
-  .env
-  
-  username=user1
-  
+> example: <br>
+  .env <br>
+  username=user1 <br>
   password=password1
 
 ## run without switching to virtual env
