@@ -37,5 +37,4 @@ $ https://beta.otaku-streamers.com/title/4481/Gate:_Jieitai_Kanochi_nite,_Kaku_T
 ```
 
 *note: to get out of virtual env,*
-
-*$ deactivate*
+```$ deactivate```
