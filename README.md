@@ -31,6 +31,7 @@ $ https://beta.otaku-streamers.com/title/4481/Gate:_Jieitai_Kanochi_nite,_Kaku_T
 ## run with switching to the virutal env
 ```
 [in clone] $ pipenv shell
+$ python downloader.py
 $ <enter url of anime>
 example:
 $ https://beta.otaku-streamers.com/title/4481/Gate:_Jieitai_Kanochi_nite,_Kaku_Tatakaeri
