@@ -12,8 +12,11 @@ username=<otaku-streamer username>
 password=<otaku-streamer password>
 ```
 > example:
+
   .env
+  
   username=user1
+  
   password=password1
 
 ## run without switching to virtual env
