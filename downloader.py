@@ -4,7 +4,7 @@ import os
 import concurrent.futures
 from bs4 import BeautifulSoup
 
-url = input()
+url = input('enter base url: \n')
 page = requests.get(url)
 soup = BeautifulSoup(page.content, 'html.parser')
 episodes = soup.find('ul', class_='os-album-list')
