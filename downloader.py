@@ -11,7 +11,7 @@ episodes = soup.find('ul', class_='os-album-list')
 links = episodes.find_all('a')
 hrefs = list(set([l['href'] for l in links]))
 
-title_pattern = re.compile(r'(\d+)/episode(\d+)-([a-zA-Z0-9_:]*)')
+title_pattern = re.compile(r'(\d+)/episode(\d+)-(.*)')  
 
 payload = {
     'username': os.environ['username'],
@@ -19,8 +19,16 @@ payload = {
 } 
 
 def download(sess, src, title, ep_num):
+    cwd = os.getcwd()
+    if not os.path.exists(r"{}\{}".format(cwd, title)):
+        try:
+            os.mkdir(r"{}\{}".format(cwd, title))
+        except:
+            pass
+
     vid_stream = sess.get(src, stream=True, verify=False)
-    filename = r"{}\{}\{} - {}.mp4".format(os.getcwd(), title, title, ep_num)
+    filename = r"{}\{}\{} - {}.mp4".format(cwd, title, title, ep_num)
+    # print(filename)
     with open(filename, 'wb') as wf:
         for chunk in vid_stream.iter_content(chunk_size=8192):
             if chunk:
