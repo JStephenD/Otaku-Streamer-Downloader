@@ -4,6 +4,8 @@ import os
 import concurrent.futures
 from bs4 import BeautifulSoup
 
+requests.packages.urllib3.disable_warnings()
+
 url = input('enter base url: \n')
 page = requests.get(url)
 soup = BeautifulSoup(page.content, 'html.parser')
@@ -27,7 +29,7 @@ def download(sess, src, title, ep_num):
             pass
 
     vid_stream = sess.get(src, stream=True, verify=False)
-    filename = r"{}\{}\{} - {}.mp4".format(cwd, title, title, ep_num)
+    filename = r"{}\{}\{} ep{:02}.mp4".format(cwd, title, title, ep_num)
     # print(filename)
     with open(filename, 'wb') as wf:
         for chunk in vid_stream.iter_content(chunk_size=8192):
