@@ -29,12 +29,20 @@ def download(sess, src, title, ep_num):
             pass
 
     vid_stream = sess.get(src, stream=True, verify=False)
-    filename = r"{}\{}\{} ep{:02}.mp4".format(cwd, title, title, ep_num)
-    # print(filename)
-    with open(filename, 'wb') as wf:
-        for chunk in vid_stream.iter_content(chunk_size=8192):
-            if chunk:
-                wf.write(chunk)
+    # filename = r"{}\{}\{} EP{:02}.mp4".format(cwd, title, title, ep_num)
+    try:
+        filename = ''
+        if '.' in ep_num:
+            filename = r"{}\{}\{} ep{:02}.mp4".format(cwd, title, title, float(ep_num))
+        else:
+            filename = r"{}\{}\{} ep{:02}.mp4".format(cwd, title, title, int(ep_num))
+        # print(filename)
+        with open(filename, 'wb') as wf:
+            for chunk in vid_stream.iter_content(chunk_size=8192):
+                if chunk:
+                    wf.write(chunk)
+    except:
+        return f'ERROR on {title} - {ep_num}'
 
     return f'DOWNLOADED {title} - {ep_num}'
 
