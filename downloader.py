@@ -1,10 +1,20 @@
 import re
 import requests
 import os
+import sys
+import time
 import concurrent.futures
 from bs4 import BeautifulSoup
+from collections import defaultdict
 
 requests.packages.urllib3.disable_warnings()
+
+do_progress = False
+start = time.time()
+percentages = defaultdict(int)
+if len(sys.argv) != 1:
+    if '-progress' in sys.argv:
+        do_progress = True
 
 url = input('enter base url: \n')
 page = requests.get(url)
@@ -21,6 +31,7 @@ payload = {
 } 
 
 def download(sess, src, title, ep_num):
+    global start
     cwd = os.getcwd()
     if not os.path.exists(r"{}\{}".format(cwd, title)):
         try:
@@ -29,7 +40,9 @@ def download(sess, src, title, ep_num):
             pass
 
     vid_stream = sess.get(src, stream=True, verify=False)
-    # filename = r"{}\{}\{} EP{:02}.mp4".format(cwd, title, title, ep_num)
+    total_size = vid_stream.headers.get('content-length')
+    total_size = int(total_size)
+    downloaded = 0
     try:
         filename = ''
         if '.' in ep_num:
@@ -38,16 +51,32 @@ def download(sess, src, title, ep_num):
             filename = r"{}\{}\{} ep{:02}.mp4".format(cwd, title, title, int(ep_num))
         # print(filename)
         with open(filename, 'wb') as wf:
+            if not do_progress: print(f'downloading {title} - {ep_num}')
             for chunk in vid_stream.iter_content(chunk_size=8192):
                 if chunk:
                     wf.write(chunk)
-    except:
-        return f'ERROR on {title} - {ep_num}'
+
+                    if do_progress:
+                        downloaded += len(chunk)
+                        percentages[int(ep_num)] = int(100 * downloaded / total_size)
+                        
+                        if time.time() - start >= 5:
+                            start = time.time()
+                            sys.stdout.write('\033[{}A'.format(len(hrefs)))
+                            sys.stdout.flush()
+                            for i in range(1, len(hrefs)+1):
+                                if percentages[i] == 0:
+                                    sys.stdout.write('\n')
+                                else:
+                                    sys.stdout.write('\r[{:>3}%] << ep {}{}\n'.format(percentages[i], i,' '*100))
+                                sys.stdout.flush()
+    except Exception as e:
+        return f'ERROR on {title} - {ep_num} error message: {e}'
 
     return f'DOWNLOADED {title} - {ep_num}'
 
 
-print('----')
+print(f'Progress bar = {do_progress}')
 with requests.Session() as sess:
     sess_get = sess.get('https://beta.otaku-streamers.com/')
     logged_in = sess.post('https://beta.otaku-streamers.com/login', data=payload)
@@ -71,8 +100,14 @@ with requests.Session() as sess:
             'ep_num': ep_num
         })
 
-    with concurrent.futures.ThreadPoolExecutor() as executor:
+        if do_progress:
+            sys.stdout.write('{:<50}\n'.format("waiting for download"))
+            sys.stdout.flush()
+    sys.stdout.flush()
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
         results = [executor.submit(download, sess, s['src'], s['title'], s['ep_num']) for s in srcs]
 
         for f in concurrent.futures.as_completed(results):
-            print(f.result())
+            if not do_progress:
+                print(f.result())
