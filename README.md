@@ -2,7 +2,7 @@
 
 ## steeeeeps:
 
-> clone/download repository
+> clone/download repository <br>
 > cd into repository (terminal of your choosing)
 
 ```$ pip install pipenv```
