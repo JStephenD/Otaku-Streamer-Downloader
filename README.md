@@ -1,6 +1,6 @@
 # Otaku-Streamer-Downloader
 
-## steeps:
+## steeeeeps:
 
 ```$ pip install pipenv```
 
