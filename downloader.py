@@ -66,9 +66,10 @@ def download(sess, src, title, ep_num):
                             sys.stdout.flush()
                             for i in range(1, len(hrefs)+1):
                                 if percentages[i] == 0:
-                                    sys.stdout.write('\n')
+                                    # sys.stdout.write('waiting for download')
+                                    print('\rwaiting for download')
                                 else:
-                                    sys.stdout.write('\r[{:>3}%] << ep {}{}\n'.format(percentages[i], i,' '*100))
+                                    sys.stdout.write('\r[{:>3}%] << ep {}{}'.format(percentages[i], i,' '*100))
                                 sys.stdout.flush()
     except Exception as e:
         return f'ERROR on {title} - {ep_num} error message: {e}'
