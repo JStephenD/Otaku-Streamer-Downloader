@@ -112,3 +112,4 @@ with requests.Session() as sess:
         for f in concurrent.futures.as_completed(results):
             if not do_progress:
                 print(f.result())
+    print('\nCOMPLETED DOWNLOADS')
