@@ -103,9 +103,9 @@ with requests.Session() as sess:
         if do_progress:
             sys.stdout.write('{:<50}\n'.format("waiting for download"))
             sys.stdout.flush()
-    sys.stdout.flush()
+    # sys.stdout.flush()
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
+    with concurrent.futures.ThreadPoolExecutor() as executor:
         results = [executor.submit(download, sess, s['src'], s['title'], s['ep_num']) for s in srcs]
 
         for f in concurrent.futures.as_completed(results):
