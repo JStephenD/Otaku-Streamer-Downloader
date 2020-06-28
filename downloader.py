@@ -122,6 +122,6 @@ with requests.Session() as sess:
             # sys.stdout.write('waiting for download')
             print('\rwaiting for download')
         else:
-            sys.stdout.write('\r[{:>3}%] << ep {}{}'.format(percentages[i], i,' '*100))
+            sys.stdout.write('\r[{:>3}%] << ep {}{}'.format(percentages[i], i,' '*20))
         sys.stdout.flush()
     print('\nCOMPLETED DOWNLOADS')
