@@ -114,4 +114,14 @@ with requests.Session() as sess:
         for f in concurrent.futures.as_completed(results):
             if not do_progress:
                 print(f.result())
+    
+    sys.stdout.write('\033[{}A'.format(len(hrefs)))
+    sys.stdout.flush()
+    for i in range(1, len(hrefs)+1):
+        if percentages[i] == 0:
+            # sys.stdout.write('waiting for download')
+            print('\rwaiting for download')
+        else:
+            sys.stdout.write('\r[{:>3}%] << ep {}{}'.format(percentages[i], i,' '*100))
+        sys.stdout.flush()
     print('\nCOMPLETED DOWNLOADS')
