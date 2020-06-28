@@ -17,7 +17,7 @@ if len(sys.argv) != 1:
         do_progress = True
 
 url = input('enter base url: \n')
-season_num = input('enter season number: \n')
+season_num = int(input('enter season number: \n'))
 page = requests.get(url)
 soup = BeautifulSoup(page.content, 'html.parser')
 episodes = soup.find('ul', class_='os-album-list')
@@ -35,10 +35,11 @@ def download(sess, src, title, ep_num):
     global start
     cwd = os.getcwd()
     if not os.path.exists(r"{}\{}".format(cwd, title)):
-        try:
-            os.mkdir(r"{}\{}".format(cwd, title))
-        except:
-            pass
+        try: os.mkdir(r"{}\{}".format(cwd, title))
+        except: pass
+    if not os.path.exists(r"{}\{}\Season {}".format(cwd, title, season_num)):
+        try: os.mkdir(r"{}\{}\Season {}".format(cwd, title, season_num))
+        except: pass
 
     vid_stream = sess.get(src, stream=True, verify=False)
     total_size = vid_stream.headers.get('content-length')
@@ -47,10 +48,10 @@ def download(sess, src, title, ep_num):
     try:
         filename = ''
         if '.' in ep_num:
-            filename = r"{}\{}\Season {}\{} S0{}E{:02}.mp4".format(cwd, title, season_num, title, season_num, float(ep_num))
+            filename = r"{}\{}\Season {}\{} S{:02}E{:02}.mp4".format(cwd, title, season_num, title, season_num, float(ep_num))
         else:
-            filename = r"{}\{}\Season {}\{} S0{}E{:02}.mp4".format(cwd, title, season_num, title, season_num, int(ep_num))
-        # print(filename)
+            filename = r"{}\{}\Season {}\{} S{:02}E{:02}.mp4".format(cwd, title, season_num, title, season_num, int(ep_num))
+        # print(os.path.exists(filename))
         with open(filename, 'wb') as wf:
             if not do_progress: print(f'downloading {title} - {ep_num}')
             for chunk in vid_stream.iter_content(chunk_size=8192):
