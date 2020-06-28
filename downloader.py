@@ -17,6 +17,7 @@ if len(sys.argv) != 1:
         do_progress = True
 
 url = input('enter base url: \n')
+season_num = input('enter season number: \n')
 page = requests.get(url)
 soup = BeautifulSoup(page.content, 'html.parser')
 episodes = soup.find('ul', class_='os-album-list')
@@ -46,9 +47,9 @@ def download(sess, src, title, ep_num):
     try:
         filename = ''
         if '.' in ep_num:
-            filename = r"{}\{}\{} ep{:02}.mp4".format(cwd, title, title, float(ep_num))
+            filename = r"{}\{}\Season {}\{} S0{}E{:02}.mp4".format(cwd, title, season_num, title, season_num, float(ep_num))
         else:
-            filename = r"{}\{}\{} ep{:02}.mp4".format(cwd, title, title, int(ep_num))
+            filename = r"{}\{}\Season {}\{} S0{}E{:02}.mp4".format(cwd, title, season_num, title, season_num, int(ep_num))
         # print(filename)
         with open(filename, 'wb') as wf:
             if not do_progress: print(f'downloading {title} - {ep_num}')
