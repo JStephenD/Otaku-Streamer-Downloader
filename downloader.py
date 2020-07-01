@@ -24,7 +24,7 @@ episodes = soup.find('ul', class_='os-album-list')
 links = episodes.find_all('a')
 hrefs = list(set([l['href'] for l in links]))
 
-title_pattern = re.compile(r'(\d+)/episode(\d+)-(.*)')  
+title_pattern = re.compile(r'(\d+)/episode(\d+)-(.*)')
 
 payload = {
     'username': os.environ['username'],
@@ -40,14 +40,14 @@ def download(sess, src, title, ep_num):
     if not os.path.exists(r"{}\{}\Season {}".format(cwd, title, season_num)):
         try: os.mkdir(r"{}\{}\Season {}".format(cwd, title, season_num))
         except: pass
-
+    
     vid_stream = sess.get(src, stream=True, verify=False)
     total_size = vid_stream.headers.get('content-length')
     total_size = int(total_size)
     downloaded = 0
     try:
         filename = ''
-        if '.' in ep_num:
+        if '.' in str(ep_num):
             filename = r"{}\{}\Season {}\{} S{:02}E{:02}.mp4".format(cwd, title, season_num, title, season_num, float(ep_num))
         else:
             filename = r"{}\{}\Season {}\{} S{:02}E{:02}.mp4".format(cwd, title, season_num, title, season_num, int(ep_num))
@@ -68,10 +68,9 @@ def download(sess, src, title, ep_num):
                             sys.stdout.flush()
                             for i in range(1, len(hrefs)+1):
                                 if percentages[i] == 0:
-                                    # sys.stdout.write('waiting for download')
                                     print('\rwaiting for download')
                                 else:
-                                    sys.stdout.write('\r[{:>3}%] << ep {}{}'.format(percentages[i], i,' '*100))
+                                    sys.stdout.write('\r[{:>3}%] << ep {}{}\n'.format(percentages[i], i,' '*20))
                                 sys.stdout.flush()
     except Exception as e:
         return f'ERROR on {title} - {ep_num} error message: {e}'
@@ -104,7 +103,7 @@ with requests.Session() as sess:
         })
 
         if do_progress:
-            sys.stdout.write('{:<50}\n'.format("waiting for download"))
+            sys.stdout.write('{}\n'.format("waiting for download"))
             sys.stdout.flush()
     # sys.stdout.flush()
 
@@ -112,16 +111,12 @@ with requests.Session() as sess:
         results = [executor.submit(download, sess, s['src'], s['title'], s['ep_num']) for s in srcs]
 
         for f in concurrent.futures.as_completed(results):
-            if not do_progress:
-                print(f.result())
+            print(f.result())
     
-    sys.stdout.write('\033[{}A'.format(len(hrefs)))
-    sys.stdout.flush()
     for i in range(1, len(hrefs)+1):
         if percentages[i] == 0:
-            # sys.stdout.write('waiting for download')
             print('\rwaiting for download')
         else:
-            sys.stdout.write('\r[{:>3}%] << ep {}{}'.format(percentages[i], i,' '*20))
+            sys.stdout.write('\r[{:>3}%] << ep {}{}\n'.format(percentages[i], i,' '*20))
         sys.stdout.flush()
     print('\nCOMPLETED DOWNLOADS')
