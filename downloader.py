@@ -10,12 +10,22 @@ from collections import defaultdict
 requests.packages.urllib3.disable_warnings()
 
 do_progress = False
+max_workers = 8
 start = time.time()
 percentages = defaultdict(int)
 downloaded = defaultdict(lambda : [0, 0])
-if len(sys.argv) != 1:
-    if '-progress' in sys.argv:
+dl_from = None
+dl_to = None
+for arg in sys.argv:
+    if arg == '-progress':
         do_progress = True
+    if arg == '-4':
+        max_workers = 4
+    if 'from' in arg:
+        dl_from = int(arg.split('=')[1])
+    if 'to' in arg:
+        dl_to = int(arg.split('=')[1])
+    
 
 url = input('enter base url: \n')
 season_num = int(input('enter season number: \n'))
@@ -34,7 +44,7 @@ payload = {
 } 
 
 def download(sess, src, title, ep_num):
-    global start
+    global start, ep_nums
     ep_num = int(ep_num)
     cwd = os.getcwd()
     if not os.path.exists(r"{}\{}".format(cwd, title)):
@@ -69,7 +79,7 @@ def download(sess, src, title, ep_num):
                         if end - start >= 5:
                             _start = start
                             start = time.time()
-                            sys.stdout.write('\033[{}A'.format(len(hrefs)))
+                            sys.stdout.write('\033[{}A'.format(len(ep_nums)))
                             sys.stdout.flush()
                             for i in ep_nums:
                                 if percentages[i] == 0:
@@ -94,10 +104,22 @@ with requests.Session() as sess:
     logged_in = sess.post('https://beta.otaku-streamers.com/login', data=payload)
 
     srcs = []
+    dl_range = None
+    if dl_from:
+        if dl_to:
+            dl_range = [i for i in range(dl_from, dl_to+1)]
+        else: 
+            dl_range = dl_from
 
     def helper(href):
         x = re.search(title_pattern, href)
         anime_id, ep_num, title = x.group(1, 2, 3)
+
+        if type(dl_range) == int:
+            if int(ep_num) < dl_range: return
+        if type(dl_range) == list:
+            if int(ep_num) not in dl_range: return
+
         title = title.replace('_', ' ')
         title = title.replace(':', '').replace('<', '').replace('>', '').replace('?', ''). \
             replace('*', '').replace('|', '')
@@ -122,12 +144,15 @@ with requests.Session() as sess:
     
     ep_nums.sort()
 
-    with concurrent.futures.ThreadPoolExecutor() as executor:
+    errors = []
+    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
         results = [executor.submit(download, sess, s['src'], s['title'], s['ep_num']) for s in srcs]
 
         for f in concurrent.futures.as_completed(results):            
+            res = f.result()
+            errors.append(res)
             if not do_progress:
-                print(f.result())
+                print(res)
     
     sys.stdout.write('\033[{}A'.format(len(hrefs)))
     sys.stdout.flush()
@@ -138,3 +163,6 @@ with requests.Session() as sess:
             sys.stdout.write('\r[{:>3}%] << ep {}{}\n'.format(percentages[i], i,' '*15))
         sys.stdout.flush()
     print('\nCOMPLETED DOWNLOADS')
+
+    for i in errors:
+        print(i)

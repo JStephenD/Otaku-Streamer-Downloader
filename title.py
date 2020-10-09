@@ -13,10 +13,14 @@ def download(title, ep_num):
     if not os.path.exists(r"{}\{}".format(cwd, title)):
         os.mkdir(r"{}\{}".format(cwd, title))
 
-    filename = r"{}\{}\{} - {}.mp4".format(cwd, title, title, ep_num)
+    # with open(r'{}\{}\Season\s.txt'.format(cwd, title)) as f:
+    #     pass
+    # print(os.path.exists(r'{}\{}\Season\s.txt'.format(cwd, title)))
+
+    filename = r"{}\{}\Season {}\{} S{:02}E{:02}.mp4".format(cwd, title, 1, title, 1, int(ep_num))
     print(filename)
-    with open(filename, 'wb') as wf:
-        pass
+    # with open(filename, 'wb') as wf:
+    #     pass
 
     return f'DOWNLOADED {title} - {ep_num}'
 
